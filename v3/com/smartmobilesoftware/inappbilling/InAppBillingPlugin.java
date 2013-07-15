@@ -301,13 +301,23 @@ public class InAppBillingPlugin extends CordovaPlugin {
             // sku, you probably should check...
             if (result.isSuccess()) {
                 // successfully consumed, so we apply the effects of the item in our
+                // successfully consumed, so we apply the effects of the item in our
                 // game world's logic
             	
                 // remove the item from the inventory
             	myInventory.erasePurchase(purchase.getSku());
                 Log.d(TAG, "Consumption successful. .");
                 
-                callbackContext.success(purchase.getOriginalJson());
+               // return data and signature in js for verify purchase
+               	try {
+                	JSONObject purchaseJsonObject = new JSONObject();
+                	purchaseJsonObject.put("data", purchase.getOriginalJson());
+                	purchaseJsonObject.put("signature", purchase.getSignature());
+                	callbackContext.success(purchaseJsonObject.toString());
+
+                } catch (JSONException e) {
+			callbackContext.error("Error while consuming: " + result);
+		}
                 
             }
             else {
